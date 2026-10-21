@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Swim Week</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Swim Week">
+<meta name="theme-color" content="#edf3f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08161c" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>@font-face{font-family:'Barlow Condensed';font-weight:600;font-style:normal;font-display:swap;src:url(fonts/bc-600.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-weight:700;font-style:normal;font-display:swap;src:url(fonts/bc-700.woff2) format('woff2')}@font-face{font-family:'Atkinson Hyperlegible';font-weight:400;font-style:normal;font-display:swap;src:url(fonts/ah-400.woff2) format('woff2')}@font-face{font-family:'Atkinson Hyperlegible';font-weight:700;font-style:normal;font-display:swap;src:url(fonts/ah-700.woff2) format('woff2')}
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
+img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<style>
+/* Layout: one phone column. 18-week strip → 7 day chips → one session card whose lane strip shows the session to scale in metres. */
+:root{
+  --bg:#edf3f5; --surface:#ffffff; --surface-2:#e2ecf0; --ink:#0e2a35; --ink-2:#4b6571; --line:#cddbe1;
+  --accent:#cf2f3c; --accent-ink:#ffffff;
+  --k-warm:#3a9c96; --k-drill:#c09316; --k-main:#cf2f3c; --k-easy:#2b7db3; --k-cool:#98b4c1; --k-gym:#d6801a; --k-rest:#aabdc5;
+  --good:#1d8657; --good-bg:#e1f3ea; --warn:#a55f00; --warn-bg:#fbefdc;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#08161c; --surface:#0f222a; --surface-2:#173039; --ink:#e3eff3; --ink-2:#9ab2bc; --line:#24424d;
+  --accent:#ff5c66; --accent-ink:#1b0407;
+  --k-warm:#4fc0b8; --k-drill:#e0b53a; --k-main:#ff5c66; --k-easy:#4ea6df; --k-cool:#6c8c99; --k-gym:#f0a23a; --k-rest:#4a6370;
+  --good:#4fca91; --good-bg:#12352a; --warn:#f0b04a; --warn-bg:#3a2a10; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#08161c; --surface:#0f222a; --surface-2:#173039; --ink:#e3eff3; --ink-2:#9ab2bc; --line:#24424d;
+  --accent:#ff5c66; --accent-ink:#1b0407;
+  --k-warm:#4fc0b8; --k-drill:#e0b53a; --k-main:#ff5c66; --k-easy:#4ea6df; --k-cool:#6c8c99; --k-gym:#f0a23a; --k-rest:#4a6370;
+  --good:#4fca91; --good-bg:#12352a; --warn:#f0b04a; --warn-bg:#3a2a10; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+.wrap{max-width:540px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 36px;display:flex;flex-direction:column;gap:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{display:flex;flex-direction:column;gap:10px}
+.row1{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px}
+.nav{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:24px;line-height:1;display:grid;place-items:center}
+.nav:disabled{opacity:.35;cursor:default}
+.wk{text-align:center;min-width:0}
+h1{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;margin:2px 0 2px;text-wrap:balance}
+h1 small{font-size:20px;font-weight:600;color:var(--ink-2)}
+.wkmeta{font-size:13.5px;color:var(--ink-2)}
+.tag{display:inline-block;font-family:var(--display);font-weight:600;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);vertical-align:1px}
+.tag.light{background:var(--k-cool);color:var(--surface)}
+.tag.check{background:var(--accent);color:var(--accent-ink)}
+
+.s18{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:3px}
+.s18 button{height:30px;border:0;border-radius:5px;background:var(--surface-2);font-family:var(--display);font-weight:600;font-size:12px;color:var(--ink-2);padding:0;position:relative}
+.s18 button.light{background:repeating-linear-gradient(135deg,var(--surface-2) 0 4px,var(--line) 4px 6px)}
+.s18 button.cur{box-shadow:inset 0 0 0 2px var(--ink-2)}
+.s18 button.sel{background:var(--ink);color:var(--bg)}
+.s18 button.cp::after{content:"";position:absolute;left:50%;bottom:3px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--accent)}
+.s18 button.sel.cp::after{background:var(--accent)}
+.phases{display:grid;grid-template-columns:4fr 4fr 4fr 4fr 2fr;gap:3px;font-family:var(--display);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.phases span{border-top:2px solid var(--line);padding-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phases span.on{border-color:var(--ink);color:var(--ink)}
+
+/* next + flags */
+.next{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;text-align:left;width:100%;background:var(--ink);color:var(--bg);border:0;border-radius:14px;padding:11px 14px}
+.next .eyebrow{color:inherit;opacity:.75}
+.next b{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.15}
+.next .go{grid-row:1 / span 2;grid-column:2;font-size:22px;opacity:.8}
+.flag{display:flex;gap:10px;align-items:flex-start;background:var(--warn-bg);color:var(--ink);border-radius:12px;padding:9px 12px;font-size:13.5px}
+.flag i{font-style:normal;font-weight:700;color:var(--warn)}
+
+/* day chips */
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.day{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:7px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;position:relative;min-width:0;overflow:hidden}
+.day::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--kc,var(--k-rest))}
+.day .dw{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin-top:2px}
+.day .dn{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.05}
+.day .dl{font-size:10.5px;color:var(--ink-2);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;padding-inline:2px}
+.day .st{height:14px;font-size:11px;line-height:14px;font-weight:700}
+.day.today{border-color:var(--ink)}
+.day.today .st{color:var(--accent)}
+.day.done .st{color:var(--good)}
+.day.g::after{content:"";position:absolute;inset:auto 0 0;height:4px;background:var(--k-gym)}
+.day.sel{background:var(--ink);border-color:var(--ink)}
+.day.sel .dw,.day.sel .dl{color:var(--bg);opacity:.8}
+.day.sel .dn{color:var(--bg)}
+.day.sel.done .st{color:var(--good)}
+
+/* card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:14px;touch-action:pan-y}
+.chead{display:flex;flex-direction:column;gap:2px}
+h2{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.05;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+h2 .tot{font-size:18px;font-weight:600;color:var(--ink-2)}
+.phrase{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.1;letter-spacing:.01em;padding:10px 12px;border-radius:12px;background:var(--surface-2);text-wrap:balance}
+.phrase small{display:block;font-family:var(--body);font-weight:400;font-size:12.5px;letter-spacing:0;color:var(--ink-2);margin-bottom:2px}
+
+.donebox{background:var(--good-bg);border-radius:12px;padding:9px 12px;font-size:14px}
+.donebox b{color:var(--good)}
+.donebox .dn2{color:var(--ink-2);font-size:13px}
+
+.lane{display:flex;flex-direction:column;gap:4px}
+.bar{display:flex;height:22px;border-radius:6px;overflow:hidden;gap:2px}
+.seg{min-width:3px;background:var(--kc)}
+.seg.k-main{background:repeating-linear-gradient(90deg,var(--k-main) 0 10px,color-mix(in srgb,var(--k-main) 78%,var(--surface)) 10px 14px)}
+.ticks{position:relative;height:16px;font-size:11.5px;color:var(--ink-2)}
+.ticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.ticks span.first{transform:none}
+.ticks span.last{transform:translateX(-100%);font-weight:700;color:var(--ink)}
+.lanecap{font-size:12px;color:var(--ink-2)}
+
+.parts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.parts li{display:grid;grid-template-columns:10px 1fr auto;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line);align-items:start}
+.parts li:first-child{border-top:0;padding-top:2px}
+.sw{width:10px;height:10px;border-radius:3px;background:var(--kc);margin-top:5px}
+.parts .pn{min-width:0}
+.parts .pn b{display:block;font-weight:700}
+.parts .pn span{display:block;font-size:13.5px;color:var(--ink-2)}
+.parts .pm{text-align:right;font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+.parts .pm strong{display:block;font-family:var(--display);font-weight:600;font-size:16px;color:var(--ink)}
+.parts li.main .pn b{color:var(--k-main)}
+
+.clock{display:flex;flex-direction:column;gap:6px}
+.clock ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:5px}
+.clock li{background:var(--surface-2);border-radius:9px;padding:5px 8px;display:flex;flex-direction:column}
+.clock li span{font-size:11.5px;color:var(--ink-2)}
+.clock li b{font-family:var(--display);font-weight:700;font-size:19px}
+
+.facts{display:grid;grid-template-columns:78px 1fr;gap:8px 10px;margin:0;font-size:14px}
+.facts dt{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding-top:1px}
+.facts dd{margin:0;min-width:0}
+.facts dd.hot{font-weight:700}
+
+.gym{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
+.gym h3{font-family:var(--display);font-weight:700;font-size:22px;margin:0;display:flex;gap:8px;align-items:baseline}
+.gym h3 span{font-size:15px;font-weight:600;color:var(--ink-2)}
+.gym ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.gym li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.gym li:first-child{border-top:0}
+.gym li em{font-style:normal;color:var(--ink-2);white-space:nowrap}
+.gym li.skip{color:var(--ink-2);text-decoration:line-through}
+.gym li.skip em::after{content:" · skip";text-decoration:none;color:var(--warn);font-weight:700}
+.gym p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.rest{font-size:16px}
+.cue{font-size:13.5px;color:var(--ink-2);border-left:3px solid var(--k-main);padding-left:10px}
+.swipehint{font-size:12px;color:var(--ink-2);text-align:center}
+
+details.daily{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+details.daily summary{cursor:pointer;font-weight:700}
+details.daily summary span{font-weight:400;color:var(--ink-2)}
+.dtab{width:100%;border-collapse:collapse;margin-top:8px;font-size:13.5px}
+.dtab td{padding:6px 0;border-top:1px solid var(--line);vertical-align:top}
+.dtab td:first-child{font-family:var(--display);font-weight:700;width:26px;color:var(--ink-2)}
+.dtab td:last-child{text-align:right;white-space:nowrap;color:var(--ink-2);padding-left:8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--kc);margin-right:5px;vertical-align:-1px}
+footer{font-size:12px;color:var(--ink-2);text-align:center}
+@media (prefers-reduced-motion:no-preference){.card{transition:opacity .15s}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="row1">
+      <button class="nav" id="prevW" aria-label="Previous week">‹</button>
+      <div class="wk">
+        <div class="eyebrow" id="phaseName">Phase</div>
+        <h1 id="wkTitle">Week</h1>
+        <div class="wkmeta" id="wkMeta"></div>
+      </div>
+      <button class="nav" id="nextW" aria-label="Next week">›</button>
+    </div>
+    <div class="s18" id="s18" aria-label="Weeks 1 to 18"></div>
+    <div class="phases" id="phases"><span>Even pace</span><span>Longer</span><span>Hold 3 km</span><span>Goal pace</span><span>Goal</span></div>
+  </header>
+
+  <button class="next" id="nextSwim" hidden></button>
+  <div class="flag" id="flag" hidden></div>
+
+  <nav class="days" id="days" aria-label="Days of the week"></nav>
+  <article class="card" id="card" aria-live="polite"></article>
+  <div class="swipehint">Swipe the card or tap a day</div>
+
+  <div class="legend" id="legend"></div>
+
+  <details class="daily" id="daily">
+    <summary>Every day: catch routine <span>· 12 min, band + rolled towel</span></summary>
+    <table class="dtab">
+      <tr><td>A</td><td>Upper-back extension over a rolled towel</td><td>8 slow</td></tr>
+      <tr><td>A</td><td>Open book, lying on your side</td><td>8 each</td></tr>
+      <tr><td>A</td><td>Lat stretch, kneeling, hands on a chair</td><td>2 × 30 s</td></tr>
+      <tr><td>A</td><td>Cross-body shoulder stretch</td><td>2 × 30 s each</td></tr>
+      <tr><td>B</td><td>Band external rotation, elbow at your side</td><td>2 × 15 each</td></tr>
+      <tr><td>B</td><td>Y-T-W lying face down, no weight</td><td>2 × 8 each</td></tr>
+      <tr><td>B</td><td>Scapular push-ups on your knees</td><td>2 × 12</td></tr>
+      <tr><td>C</td><td>Band catch: lean forward, elbow high and still, hand drops, pull to the hip</td><td>3 × 10 each<br>+1 set left</td></tr>
+      <tr><td>C</td><td>Mirror check, no band: elbow above the hand</td><td>10 each</td></tr>
+    </table>
+    <p class="lanecap" style="margin:8px 0 0">Left arm: light band, elbow below shoulder height. Pinching or 3/10: drop part C.</p>
+  </details>
+
+  <footer>Road to 65:00 · updated 21 Oct 2026 · <span id="net"></span></footer>
+</div>
+
+<script>
+(function(){
+/* ---------- calendar ---------- */
+const START=new Date(2026,8,28);            // Monday of week 1
+const NW=18;
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WD=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const add=(d,n)=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x};
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const dlong=d=>WD[(d.getDay()+6)%7]+' '+d.getDate()+' '+MON[d.getMonth()];
+const fmt=m=>m.toLocaleString('en-US');
+const mmss=s=>{s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const sec=t=>{const [m,s]=t.split(':').map(Number);return m*60+s};
+const now=new Date();const TODAY=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+
+/* ---------- plan ---------- */
+const PH=[
+ {name:'Even pace',cue:"Enter a wrist's length ahead, wrist flat and firm.",easy:'36–37 s',drill:{m:200,n:'Fins: one-arm, 4 × 25 each arm',h:'10 s rest. Other arm still in front. Breathe to your left.'}},
+ {name:'Longer and smoother',cue:'Shoulder near your cheek, elbow high.',easy:'36–37 s',drill:{m:200,n:'8 × 25 side-kick, lower arm long',h:'On your side, small kick, toes pointed.'}},
+ {name:'Hold it for 3 km',cue:'Press past the hip, strongest in the middle.',easy:'36 s',drill:{m:200,n:'Fins: one-arm 8 × 25, press past the hip',h:'Brush your thigh on the way out.'}},
+ {name:'Goal pace',cue:'Slower at the front, faster at the back, never stopped.',easy:'36 s',drill:{m:200,n:'4 × 50 with fins, quick hands',h:'Quick turnover, same long stroke.'}},
+ {name:'Taper and goal swim',cue:'Slower at the front, faster at the back, never stopped.',easy:'36–37 s',drill:{m:100,n:'Fins: one-arm 4 × 25, relaxed',h:'Easy. Breathe to your left.'}}
+];
+const phaseOf=w=>w<=4?0:w<=8?1:w<=12?2:w<=16?3:4;
+const S100=(tgt,len,every,rest=30,reps=4)=>({reps,d:100,tgt,len,every,rest});
+const S8={reps:8,d:100,tgt:'2:06–2:08',len:'32 s',every:'2:40',rest:30};
+const S150={reps:6,d:150,tgt:'3:12',len:'32 s',every:'3:45',rest:30};
+const S200={reps:5,d:200,tgt:'4:16',len:'32 s',every:'4:45',rest:30};
+const S500={reps:3,d:500,tgt:'10:50',len:'32.5 s',every:'11:35',rest:45};
+const WK={
+ 1:{tue:null,thu:{easyDay:true},sat:{m:2000,p:35}},
+ 2:{tue:34,thu:S8,sat:{m:2250,p:35}},
+ 3:{tue:34,thu:S8,sat:{m:3000,p:35}},
+ 4:{light:true,cue:'The catch: hand drops first, elbow stays high.',thu:S100('2:08','32 s','2:40'),sat:{timed:1330,stk:true}},
+ 5:{tue:34,thu:S150,sat:{m:3000,p:34.5}},
+ 6:{tue:33.5,thu:S150,sat:{m:3000,p:34.5}},
+ 7:{tue:33.5,thu:S150,sat:{m:3000,p:34.5,check:true}},
+ 8:{light:true,thu:S100('2:07','32 s','2:40'),sat:{timed:1310}},
+ 9:{tue:33.5,thu:S200,sat:{m:3000,p:34}},
+ 10:{tue:33.5,thu:S200,sat:{m:3000,p:34}},
+ 11:{tue:33.5,thu:S200,sat:{m:3000,p:33.5,check:true}},
+ 12:{light:true,thu:S100('2:06','31.5 s','2:40'),sat:{timed:1290}},
+ 13:{tue:33,thu:S500,sat:{m:3000,p:33.3}},
+ 14:{tue:33,thu:S500,sat:{m:3000,p:33}},
+ 15:{tue:33,thu:S500,sat:{m:3000,p:32.8,check:true}},
+ 16:{light:true,thu:S100('2:05','31 s','2:35'),sat:{timed:1270}},
+ 17:{tue:33,thu:{reps:2,d:750,tgt:'16:15',len:'32.5 s',every:'17:15',rest:60},sat:{m:2000,p:32.5}},
+ 18:{tue:33,tueM:1000,thu:S100('2:06','31.5 s','2:55',45),sat:{m:3000,goal:true}}
+};
+/* results, filled in from the log after each session */
+const DONE={
+ '2026-09-29':{t:"2,000 m · 2'24\" · HR 138"},
+ '2026-09-30':{t:"2,150 m · 2'27\" · HR 146",n:'Cramps'},
+ '2026-10-01':{t:"2,000 m + 550 m · 2'25\" · HR 137"},
+ '2026-10-03':{t:"1,800 m + 200 m · 2'53\" · HR 130",n:'11 stops, about 3 min at the wall'},
+ '2026-10-06':{t:"2,000 m · 2'19\" · HR 143",n:'4 stops · main 1,500 m in 33:58'},
+ '2026-10-07':{t:"1,750 m + 100 m · 2'51\" · HR 138",n:'Toe cramps'},
+ '2026-10-08':{t:"3,000 m in 72:03 · 2'24\" · HR 140",n:'First 3,000 m · stops cost 2:08'},
+ '2026-10-10':{t:"1,500 m + 550 m · 2'42\" · HR 133"},
+ '2026-10-13':{t:"1,900 m · 2'20\" · HR 143"},
+ '2026-10-14':{t:'1,425 m kick with fins (no goggles) · HR 127',n:'Not a bare-hand swim'},
+ '2026-10-15':{t:'8 × 100: 3 of 8 on target · best 2:03 · HR 146',n:'85 s lost leaving the wall late'},
+ '2026-10-17':{t:"3,000 m in 70:22 · 2'21\" · HR 148",n:'Best 3,000 m · 7 stops, 1:58 at the wall'},
+ '2026-10-20':{t:"1,900 m · 2'24\" · HR 144",n:'9 stops, 3:11 · best 100 m: 1:58'},
+ '2026-10-21':{t:"2,000 m with pull buoy · 2'54\" · HR 136",n:'19 lengths of 40 s or more, about 4 min at the wall (9 in the last 500 m)'}
+};
+const FLAG={from:'2026-10-17',text:'<i>Left arm 2/10</i><span>Bands before every swim, no exceptions. Gym: legs, core and light bands only.</span>'};
+const flagOn=d=>ymd(d)>=FLAG.from;
+
+const KC={warm:'--k-warm',drill:'--k-drill',main:'--k-main',easy:'--k-easy',cool:'--k-cool'};
+const STOPIF='Left arm at 3/10 or sharp: swim easy. Cramp: toes to shin for 30 s, then easy; a second cramp ends it.';
+const BEFORE={
+ morning:'At home: bands 10 min, 500 ml water.',
+ noon:'11:40 at your desk: bands 3 min. Band external rotation 15 each arm, light band catch 10 each.',
+ long:'Fri dinner: rice + lean meat + vegetables. 06:30: 500 ml water + electrolytes. 07:00: 3 large dates. Bands at home.'
+};
+const WATCH='Pool Swim → Open. Look at it only at the wall, between parts.';
+
+function steady(w,d){
+  const c=WK[w];
+  if(c.light) return {kind:'easy',label:'Easy',time:'07:45',title:'Easy',
+    phrase:'Easy 1,500 · 36–37 s',
+    parts:[{m:300,k:'warm',n:'Very easy',h:'Soft kick, long breath out.'},
+           {m:200,k:'drill',n:'4 × 50 catch focus',h:'15 s rest. Hand drops first, elbow stays high. Count strokes.'},
+           {m:800,k:'easy',n:'Easy at 36–37 s per length',h:'Heart rate under 140.'},
+           {m:100,k:'drill',n:'4 × 25 walls',h:'Tight push-off, glide for a count of 3.'},
+           {m:100,k:'cool',n:'Very easy',h:''}],
+    facts:[['Breathe','Every 2 or every 4, left side.'],['Stops','Only between parts.'],['Before',BEFORE.morning],['Goal','The 800 at 11 strokes per length or fewer.'],['Stop if',STOPIF]]};
+  if(c.tue==null) return null;
+  const p=c.tue,m=c.tueM||1500;
+  const splits=[];for(let x=500;x<=m;x+=500)splits.push([fmt(x)+' m',mmss(x/25*p)]);
+  return {kind:'steady',label:'Steady',time:'07:45',title:'Steady',
+    phrase:fmt(m)+' non-stop · '+p+' s',
+    parts:[{m:300,k:'warm',n:'Easy',h:'Last 100 building.'},
+           {m:m,k:'main',n:fmt(m)+' non-stop at '+p+' s per length',h:'First 200 at 35–36 s, then settle. 1-2-3 count.'},
+           {m:100,k:'cool',n:'Easy',h:''}],
+    clock:{t:'Wall clock for the '+fmt(m),items:splits},
+    facts:[['Breathe','Every 2, left side.'],['Stops','0 in the '+fmt(m)+'. Need air: one easy length at 37–38 s.'],['Before',BEFORE.morning],['Goal',fmt(m)+' in '+mmss(m/25*p)+', zero stops.'],['Stop if',STOPIF]]};
+}
+function easy(w,d){
+  const c=WK[w],ph=PH[phaseOf(w)];
+  if(c.light) return {kind:'easy',label:'Easy',time:'12:00',title:'Easy + technique',
+    phrase:'Easy · heart rate under 140',
+    parts:[{m:300,k:'warm',n:'Very easy',h:''},
+           {m:200,k:'drill',n:'Fins: one-arm, 4 × 25 each arm',h:'10 s rest. Breathe to your left. Hand drops first, elbow stays high.'},
+           {m:200,k:'drill',n:'4 × 50 catch + count',h:'15 s rest. 1 reach, 2 elbow high, 3 recover. 10 strokes a length.'},
+           {m:600,k:'easy',n:'Easy at 36–37 s per length',h:'Heart rate under 140. Keep the long stroke.'},
+           {m:100,k:'drill',n:'4 × 25 walls',h:'Tight push-off, glide for a count of 3.'},
+           {m:100,k:'cool',n:'Truly easy',h:'No sprints.'}],
+    facts:[['Watch','Pool Swim → Open. It misses one-arm drills: count lengths.'],['Breathe','Every 2 or every 4, left side.'],['Stops','Only between parts.'],['Before',BEFORE.noon],['Goal','The 600 at 10–11 strokes per length, heart rate under 140.'],['Stop if',STOPIF]]};
+  return {kind:'easy',label:'Easy',time:'12:00',title:'Easy + technique',
+    phrase:'Easy · heart rate under 140',
+    parts:[{m:300,k:'warm',n:'Easy',h:'4 × 25 paddles only if the shoulder is at 0/10.'},
+           {m:ph.drill.m,k:'drill',n:ph.drill.n,h:ph.drill.h},
+           {m:400,k:'drill',n:'4 × 100 pull buoy',h:'15 s rest, ankles loose. No more buoy than this.'},
+           {m:100,k:'easy',n:'Legs wake-up',h:'20 s ankle circles first, then a soft kick.'},
+           {m:100,k:'drill',n:'4 × 25 touch-turn-go',h:'Full speed off the wall, then easy.'},
+           {m:800,k:'easy',n:'Easy at '+ph.easy+' per length',h:'Heart rate under 140.'},
+           {m:200,k:'cool',n:'Easy',h:''}],
+    facts:[['Watch','Pool Swim → Open. It misses one-arm drills: count lengths.'],['Breathe','Every 2 or every 4, left side.'],['Stops','Only between parts.'],['Before',BEFORE.noon],['Goal','The 800 with heart rate under 140, no sprints.'],['Stop if',STOPIF]]};
+}
+function fast(w,d){
+  const c=WK[w],t=c.thu;
+  if(t.easyDay) return {kind:'easy',label:'Easy',time:'12:00',title:'Easy (after cramps)',
+    phrase:'Easy 2,000',parts:[{m:300,k:'warm',n:'Easy',h:''},{m:1500,k:'easy',n:'Easy, no fast set',h:"After Wednesday's cramps."},{m:200,k:'cool',n:'Easy',h:''}],
+    facts:[['Breathe','Every 2, left side.'],['Before',BEFORE.noon],['Stop if',STOPIF]]};
+  const m=t.reps*t.d,ev=sec(t.every);
+  const parts=[{m:200,k:'warm',n:'Easy',h:''},
+    {m:100,k:'drill',n:'4 × 25 with fins',h:'Smooth, toes pointed. No fins: swim them easy.'},
+    {m:100,k:'warm',n:'4 × 25 building',h:'Each faster, the last at '+t.len+'.'},
+    {m:m,k:'main',n:t.reps+' × '+t.d+' at '+t.tgt,h:t.len+' per length. Leave the wall every '+t.every+'. 1-2-3 count.'}];
+  if(c.light) parts.push({m:400,k:'easy',n:'Easy at 36–37 s per length',h:'Soft kick, heart rate under 140.'});
+  parts.push({m:300,k:'cool',n:'Easy',h:''});
+  const leave=[];for(let i=0;i<t.reps;i++)leave.push(['Rep '+(i+1),mmss(i*ev)]);
+  const g='All '+t.reps+' at '+t.tgt+' or faster, even lengths.'+(t.d===100?' 10–11 breaths a length.':'');
+  return {kind:'fast',label:'Fast',time:'12:00',title:'Fast',
+    phrase:t.reps+' × '+t.d+' · '+t.len+' · every '+t.every,
+    parts,clock:{t:'Leave the wall at (clock from the start of the set)',items:leave},
+    facts:[['Breathe','Every 2, left side.'],['Stops','Rest only in the gap between reps. Leave on time.'],['Before',BEFORE.noon],['Goal',g],['Stop if','A rep 3 s or more over target: stop the set, swim easy. '+STOPIF]]};
+}
+function long(w,d){
+  const s=WK[w].sat;
+  if(s.timed){const T=s.timed,sp=[];for(let k=1;k<=4;k++)sp.push([fmt(k*250)+' m',mmss(Math.floor(T*k/4))]);
+    return {kind:'test',label:'Test',time:'08:00',title:'1,000 m timed',
+      phrase:'1,000 · under '+mmss(T),
+      parts:[{m:300,k:'warm',n:'Easy',h:''},{m:1000,k:'main',n:'1,000 timed, under '+mmss(T),h:(T/40).toFixed(1).replace('.0','')+' s per length. Even lengths, no stops.'},{m:200,k:'cool',n:'Easy',h:''}],
+      clock:{t:'Wall clock for the 1,000',items:sp},
+      facts:[['Breathe','Every 2, left side.'],['Stops','0 in the 1,000. Need air: one easier length, never the wall.'],['Before',BEFORE.morning],['Goal','1,000 m under '+mmss(T)+', even lengths.'+(s.stk?' 45 strokes per 100 m or fewer.':'')],['Stop if',STOPIF]]};}
+  const m=s.m;let sp=[],main,phrase,goal;
+  if(s.goal){let tt=0;for(let x=500;x<=m;x+=500){tt+=x===500?660:648;sp.push([fmt(x)+' m',mmss(tt)])}
+    main={m,k:'main',n:'Goal swim: 3,000 in 65:00',h:'First 500 at 33 s per length, then 32.4 s. Reset at 1,000 m: 12 breaths a length.'};
+    phrase='3,000 · 65:00';goal='3,000 m in 65:00, bare hand, zero stops.';}
+  else{const p=s.p;for(let x=500;x<=m;x+=500)sp.push([fmt(x)+' m',mmss(x/25*p)]);if(m%500)sp.push([fmt(m)+' m',mmss(m/25*p)]);
+    main={m,k:'main',n:fmt(m)+' non-stop at '+p+' s per length',h:'Second half the same or faster. Reset at 1,000 m: 12 breaths a length for 20 lengths.'};
+    phrase=fmt(m)+' · '+p+' s · '+mmss(m/25*p);goal=fmt(m)+' in '+mmss(m/25*p)+', zero stops.'+(s.check?' Checkpoint.':'');}
+  return {kind:'long',label:s.goal?'Goal':'Long',time:'08:00',title:s.goal?'Goal swim':'Long',phrase,
+    parts:[{m:300,k:'warm',n:'Easy',h:''},main,{m:200,k:'cool',n:'Easy',h:''}],
+    clock:{t:'Wall clock every 500 m',items:sp},
+    facts:[['Breathe','Every 2, left side.'],['Stops','0. Need air: one easy length at 37–38 s, never the wall.'],['Before',BEFORE.long],['Goal',goal],['Stop if',STOPIF]]};
+}
+function gym(w,d,which){
+  const light=WK[w].light,arm=flagOn(d);
+  const L=which==='tue'
+   ?[['Bands','10 min'],['Goblet squat','3 × 8 heavy'],['Romanian deadlift','3 × 8 heavy'],['Chest press','2 × 10 moderate',1],['Seated row','2 × 10 light',1],['Plank','3 × 45 s'],['Side plank','3 × 30 s']]
+   :[['Bands','10 min'],['Lat pulldown to the front','3 × 10',1],['Seated row','3 × 10',1],['Chest press','3 × 10',1],['Goblet squat','3 × 8'],['Dead bug','3 × 10 each side'],['Single-leg calf raise','3 × 12 each'],['Hollow hold','3 × 20 s']];
+  return {label:'Gym',time:which==='tue'?'12:00':'',title:which==='tue'?'Gym: legs heavy, pulling light':'Gym: full body, upper heavier',
+    items:L.map(([a,b,arms])=>({a,b,skip:arms&&arm})),
+    notes:[light?'Light week: one set less on each.':'',arm?'Left arm not pain-free yet: skip the crossed-out moves.':'','No overhead pressing, ever.'+(which==='sun'?' Calf raises only on Sunday.':'')].filter(Boolean)};
+}
+function weekDays(w){
+  const mon=add(START,7*(w-1));
+  return WD.map((n,i)=>{const d=add(mon,i);const o={date:d,i};
+    if(i===1){o.swim=steady(w,d);o.gym=gym(w,d,'tue')}
+    else if(i===2)o.swim=easy(w,d);
+    else if(i===3)o.swim=fast(w,d);
+    else if(i===5)o.swim=long(w,d);
+    else if(i===6)o.gym=gym(w,d,'sun');
+    else o.rest=i===0?'Walk 30 minutes. Stretch lats, triceps and calves.':'No swim, no gym. Fresh arms for Saturday.';
+    return o});
+}
+const total=s=>s.parts.reduce((a,p)=>a+p.m,0);
+
+/* ---------- state ---------- */
+let curW=Math.floor((TODAY-START)/864e5/7)+1;
+let selW=Math.min(NW,Math.max(1,curW));
+let selD=(curW===selW)?(TODAY.getDay()+6)%7:(curW<1?1:5);
+
+/* ---------- render ---------- */
+const $=id=>document.getElementById(id);
+function rel(d){const diff=Math.round((d-TODAY)/864e5);return diff===0?'Today':diff===1?'Tomorrow':diff===-1?'Yesterday':''}
+function lane(s){
+  const T=total(s);let acc=0,last=-1e9,ticks=[];
+  const segs=s.parts.map(p=>`<span class="seg k-${p.k}" style="--kc:var(${KC[p.k]});flex:${p.m} 1 0"></span>`).join('');
+  ticks.push(`<span class="first" style="left:0">0</span>`);last=0;
+  s.parts.forEach((p,i)=>{acc+=p.m;if(i===s.parts.length-1)return;const pct=acc/T*100;
+    if(pct-last>=13&&100-pct>=19){ticks.push(`<span style="left:${pct}%">${fmt(acc)}</span>`);last=pct}});
+  ticks.push(`<span class="last" style="left:100%">${fmt(T)} m</span>`);
+  return `<div class="lane"><div class="bar" role="img" aria-label="Session to scale, ${fmt(T)} metres">${segs}</div><div class="ticks num">${ticks.join('')}</div></div>`;
+}
+function partsList(s){
+  let a=0;return `<ol class="parts">`+s.parts.map(p=>{const b=a+p.m;const li=`<li class="${p.k==='main'?'main':''}"><span class="sw" style="--kc:var(${KC[p.k]})"></span><div class="pn"><b>${p.n}</b>${p.h?`<span>${p.h}</span>`:''}</div><div class="pm num"><strong>${fmt(a)}–${fmt(b)}</strong>${p.m/25} lengths</div></li>`;a=b;return li}).join('')+`</ol>`;
+}
+function swimCard(o,s){
+  const T=total(s),done=DONE[ymd(o.date)];
+  return `<div class="chead"><div class="eyebrow">${dlong(o.date)} · ${s.time}${rel(o.date)?' · '+rel(o.date):''}</div>
+    <h2>${s.title}<span class="tot num">${fmt(T)} m · ${T/25} lengths</span></h2></div>
+    ${done?`<div class="donebox"><b>Done ✓</b> ${done.t}${done.n?`<div class="dn2">${done.n}</div>`:''}</div>`:''}
+    <div class="phrase"><small>Remember this</small>${s.phrase.replace(/ s\b/g,'\u00a0s').replace(/every /g,'every\u00a0').replace(/ × /g,'\u00a0×\u00a0')}</div>
+    ${lane(s)}
+    ${partsList(s)}
+    ${s.clock?`<div class="clock"><div class="eyebrow">${s.clock.t}</div><ol>${s.clock.items.map(([a,b])=>`<li><span>${a}</span><b class="num">${b}</b></li>`).join('')}</ol></div>`:''}
+    <dl class="facts"><dt>Watch</dt><dd>${(s.facts.find(f=>f[0]==='Watch')||[0,WATCH])[1]}</dd>${s.facts.filter(f=>f[0]!=='Watch').map(([k,v])=>`<dt>${k}</dt><dd class="${k==='Goal'?'hot':''}">${v}</dd>`).join('')}</dl>
+    <div class="cue"><b>Technique cue:</b> ${WK[selW].cue||PH[phaseOf(selW)].cue}</div>`;
+}
+function gymBlock(o,g,alone){
+  const done=alone?DONE[ymd(o.date)]:null;
+  return `<div class="${alone?'':'gym'}">${alone?`<div class="chead"><div class="eyebrow">${dlong(o.date)}${rel(o.date)?' · '+rel(o.date):''}</div><h2>${g.title.split(': ')[0]}<span class="tot">${g.title.split(': ')[1]}</span></h2></div>`:`<h3>${g.title.split(': ')[0]} <span>${g.time} · ${g.title.split(': ')[1]}</span></h3>`}
+    ${done?`<div class="donebox"><b>Done ✓</b> ${done.t}</div>`:''}
+    <div class="${alone?'gym':''}" style="${alone?'border:0;padding:0':''}"><ul>${g.items.map(x=>`<li class="${x.skip?'skip':''}"><span>${x.a}</span><em>${x.b}</em></li>`).join('')}</ul>
+    ${g.notes.map(n=>`<p>${n}</p>`).join('')}</div></div>`;
+}
+function render(){
+  const days=weekDays(selW),ph=PH[phaseOf(selW)],c=WK[selW];
+  const mon=days[0].date,sun=days[6].date;
+  $('phaseName').textContent='Phase '+(phaseOf(selW)+1)+' · '+ph.name;
+  $('wkTitle').innerHTML=`Week ${selW} <small>of 18</small>`;
+  const km=days.reduce((a,o)=>a+(o.swim?total(o.swim):0),0);
+  const range=mon.getMonth()===sun.getMonth()?`${mon.getDate()}–${sun.getDate()} ${MON[sun.getMonth()]}`:`${mon.getDate()} ${MON[mon.getMonth()]} – ${sun.getDate()} ${MON[sun.getMonth()]}`;
+  const tags=(c.light?' <span class="tag light">Light week</span>':'')+(c.sat.check?' <span class="tag check">Checkpoint</span>':'')+(c.sat.goal?' <span class="tag check">Goal swim</span>':'');
+  $('wkMeta').innerHTML=`<span class="num">${range} · ${(km/1000).toFixed(1)} km swim</span>${tags}`;
+  $('prevW').disabled=selW<=1;$('nextW').disabled=selW>=NW;
+  $('s18').innerHTML=Array.from({length:NW},(_,i)=>{const w=i+1,k=WK[w];return `<button class="${k.light?'light ':''}${(k.sat.check||k.sat.goal)?'cp ':''}${w===curW?'cur ':''}${w===selW?'sel':''}" data-w="${w}" aria-label="Week ${w}${k.light?', light week':''}" aria-pressed="${w===selW}">${w}</button>`}).join('');
+  [...$('phases').children].forEach((s,i)=>s.classList.toggle('on',i===phaseOf(selW)));
+  $('days').innerHTML=days.map(o=>{const s=o.swim,g=o.gym;const kind=s?s.kind:(g?'gym':'rest');
+    const kc={steady:'--k-main',easy:'--k-easy',fast:'--k-main',long:'--k-main',test:'--k-main',gym:'--k-gym',rest:'--k-rest'}[kind];
+    const label=s?s.label:(g?'Gym':'Rest');
+    const isT=+o.date===+TODAY,done=!!DONE[ymd(o.date)];
+    return `<button class="day${s&&g?' g':''}${o.i===selD?' sel':''}${isT?' today':''}${done?' done':''}" style="--kc:var(${kc})" data-d="${o.i}" aria-pressed="${o.i===selD}" aria-label="${dlong(o.date)}, ${label}${done?', done':''}${isT?', today':''}"><span class="dw">${WD[o.i]}</span><span class="dn num">${o.date.getDate()}</span><span class="dl">${label}</span><span class="st">${done?'✓':isT?'●':''}</span></button>`}).join('');
+  const o=days[selD];let html='';
+  if(o.swim){html=swimCard(o,o.swim);if(o.gym)html+=gymBlock(o,o.gym,false)}
+  else if(o.i===1){html=`<div class="chead"><div class="eyebrow">${dlong(o.date)}</div><h2>Before the plan</h2></div>${DONE[ymd(o.date)]?`<div class="donebox"><b>Done ✓</b> ${DONE[ymd(o.date)].t}</div>`:''}<p class="rest">The plan started on 30 Sep.</p>`+gymBlock(o,o.gym,false)}
+  else if(o.gym)html=gymBlock(o,o.gym,true);
+  else html=`<div class="chead"><div class="eyebrow">${dlong(o.date)}${rel(o.date)?' · '+rel(o.date):''}</div><h2>Rest</h2></div><p class="rest">${o.rest}</p><div class="cue"><b>Every day:</b> catch routine, 12 min (below).</div>`;
+  $('card').innerHTML=html;
+  const fl=flagOn(o.date)&&o.date>=add(TODAY,-1);$('flag').hidden=!fl;if(fl)$('flag').innerHTML=FLAG.text;
+}
+function nextSwim(){
+  for(let k=0;k<21;k++){const d=add(TODAY,k);const w=Math.floor((d-START)/864e5/7)+1;if(w<1||w>NW)continue;
+    const o=weekDays(w)[(d.getDay()+6)%7];if(o.swim&&!DONE[ymd(d)])return {w,i:o.i,o};}
+  return null;
+}
+function renderNext(){
+  const n=nextSwim(),b=$('nextSwim');if(!n){b.hidden=true;return}
+  b.hidden=false;b.innerHTML=`<span class="eyebrow">Next swim · ${dlong(n.o.date)} · ${n.o.swim.time}${rel(n.o.date)?' · '+rel(n.o.date):''}</span><span class="go">›</span><b>${n.o.swim.title} · ${n.o.swim.phrase}</b>`;
+  b.onclick=()=>{selW=n.w;selD=n.i;render();$('card').scrollIntoView({behavior:'smooth',block:'start'})};
+}
+$('legend').innerHTML=[['warm','Warm-up'],['drill','Drills, gear, walls'],['main','Main part'],['easy','Easy swim'],['cool','Cool-down']].map(([k,n])=>`<span><i style="--kc:var(${KC[k]})"></i>${n}</span>`).join('');
+
+/* ---------- interaction ---------- */
+function step(dir){selD+=dir;if(selD>6){if(selW<NW){selW++;selD=0}else selD=6}if(selD<0){if(selW>1){selW--;selD=6}else selD=0}render()}
+$('prevW').onclick=()=>{if(selW>1){selW--;render()}};
+$('nextW').onclick=()=>{if(selW<NW){selW++;render()}};
+$('s18').onclick=e=>{const b=e.target.closest('button');if(b){selW=+b.dataset.w;render()}};
+$('days').onclick=e=>{const b=e.target.closest('button');if(b){selD=+b.dataset.d;render()}};
+document.addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input,textarea'))return;if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1)});
+let tx=null,ty=null;const card=$('card');
+card.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+card.addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)step(dx<0?1:-1)},{passive:true});
+
+render();renderNext();
+})();
+</script>
+
+<script>
+(function(){var n=document.getElementById('net');function u(){if(n)n.textContent=navigator.onLine?'online':'offline copy'}u();addEventListener('online',u);addEventListener('offline',u);
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}})();
+</script>
+</body>
+</html>
