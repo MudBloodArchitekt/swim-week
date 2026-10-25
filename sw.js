@@ -1,4 +1,4 @@
-const CACHE='swim-week-v2';
+const CACHE='swim-week-v3';
 const ASSETS=['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'fonts/bc-600.woff2', 'fonts/bc-700.woff2', 'fonts/ah-400.woff2', 'fonts/ah-700.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

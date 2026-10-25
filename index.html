@@ -209,7 +209,7 @@ footer{font-size:12px;color:var(--ink-2);text-align:center}
     <p class="lanecap" style="margin:8px 0 0">Left arm: light band, elbow below shoulder height. Pinching or 3/10: drop part C.</p>
   </details>
 
-  <footer>Road to 65:00 · updated 22 Oct 2026 · <span id="net"></span></footer>
+  <footer>Road to 65:00 · updated 25 Oct 2026 · <span id="net"></span></footer>
 </div>
 
 <script>
@@ -246,7 +246,7 @@ const WK={
  2:{tue:34,thu:S8,sat:{m:2250,p:35}},
  3:{tue:34,thu:S8,sat:{m:3000,p:35}},
  4:{light:true,cue:'The catch: hand drops first, elbow stays high.',thu:S100('2:08','32 s','2:40'),sat:{timed:1330,stk:true}},
- 5:{tue:34,thu:S150,sat:{m:3000,p:34.5}},
+ 5:{tue:34,tueTest:1330,thu:S150,sat:{m:3000,p:34.5}},
  6:{tue:33.5,thu:S150,sat:{m:3000,p:34.5}},
  7:{tue:33.5,thu:S150,sat:{m:3000,p:34.5,check:true}},
  8:{light:true,thu:S100('2:07','32 s','2:40'),sat:{timed:1310}},
@@ -277,7 +277,8 @@ const DONE={
  '2026-10-17':{t:"3,000 m in 70:22 · 2'21\" · HR 148",n:'Best 3,000 m · 7 stops, 1:58 at the wall'},
  '2026-10-20':{t:"1,900 m · 2'24\" · HR 144",n:'9 stops, 3:11 · best 100 m: 1:58'},
  '2026-10-21':{t:"2,000 m with pull buoy · 2'54\" · HR 136",n:'19 lengths of 40 s or more, about 4 min at the wall (9 in the last 500 m)'},
- '2026-10-22':{t:'8 × 100: average 2:09.6, 2 of 8 at 2:08 · HR 150',n:'Every rest on time (29–30 s) · plan was 4 × 100'}
+ '2026-10-22':{t:'8 × 100: average 2:09.6, 2 of 8 at 2:08 · HR 150',n:'Every rest on time (29–30 s) · plan was 4 × 100'},
+ '2026-10-25':{t:"725 m easy swim · 2'37\" · HR 150 (cap was 138)",n:'Right hamstring cramp at about 715 m · after a 10 km run (HR 155) · not a test'}
 };
 const FLAG={from:'2026-10-17',text:'<i>Left arm 2/10</i><span>Bands before every swim, no exceptions. Gym: legs, core and light bands only.</span>'};
 const flagOn=d=>ymd(d)>=FLAG.from;
@@ -301,6 +302,12 @@ function steady(w,d){
            {m:100,k:'drill',n:'4 × 25 walls',h:'Tight push-off, glide for a count of 3.'},
            {m:100,k:'cool',n:'Very easy',h:''}],
     facts:[['Breathe','Every 2 or every 4, left side.'],['Stops','Only between parts.'],['Before',BEFORE.morning],['Goal','The 800 at 11 strokes per length or fewer.'],['Stop if',STOPIF]]};
+  if(c.tueTest){const T=c.tueTest,sp=[];for(let k=1;k<=4;k++)sp.push([fmt(k*250)+' m',mmss(Math.floor(T*k/4))]);
+    return {kind:'test',label:'Test',time:'07:45',title:'1,000 m timed (moved from Sat 24)',
+      phrase:'1,000 · under '+mmss(T),
+      parts:[{m:300,k:'warm',n:'Easy',h:'Breathe every 4. Left hand in line with the shoulder.'},{m:1000,k:'main',n:'1,000 timed, under '+mmss(T),h:(T/40).toFixed(1).replace('.0','')+' s per length. Even lengths, no stops, no watch checks.'},{m:200,k:'cool',n:'Easy',h:''}],
+      clock:{t:'Targets to compare afterwards. Do not look during the swim.',items:sp},
+      facts:[['Watch','Pool Swim → Open. Start at the first push-off, then leave it alone until you finish. No pace checks.'],['Go if','HRV above about 65, resting heart rate 66 or below, shoulder 2/10 or less after the warm-up, no leg pain on the stairs. Otherwise swim 1,500 m easy and test on Wed 28.'],['Breathe','Every 2, left side. 12 breaths a length or fewer, beat 21 a minute.'],['Stops','0 in the 1,000. Need air: one easier length, never the wall.'],['Before',BEFORE.morning],['Goal','1,000 m under '+mmss(T)+', even lengths.'],['Stop if',STOPIF+' Heart rate over 160: ease off.']]};}
   if(c.tue==null) return null;
   const p=c.tue,m=c.tueM||1500;
   const splits=[];for(let x=500;x<=m;x+=500)splits.push([fmt(x)+' m',mmss(x/25*p)]);
@@ -380,7 +387,7 @@ function gym(w,d,which){
    :[['Bands','10 min'],['Lat pulldown to the front','3 × 10',1],['Seated row','3 × 10',1],['Chest press','3 × 10',1],['Goblet squat','3 × 8'],['Dead bug','3 × 10 each side'],['Single-leg calf raise','3 × 12 each'],['Hollow hold','3 × 20 s']];
   return {label:'Gym',time:which==='tue'?'12:00':'',title:which==='tue'?'Gym: legs heavy, pulling light':'Gym: full body, upper heavier',
     items:L.map(([a,b,arms])=>({a,b,skip:arms&&arm})),
-    notes:[light?'Light week: one set less on each.':'',arm?'Left arm not pain-free yet: skip the crossed-out moves.':'','No overhead pressing, ever.'+(which==='sun'?' Calf raises only on Sunday.':'')].filter(Boolean)};
+    notes:[light?'Light week: one set less on each.':'',w===5&&which==='tue'?'Legs sore after the 25 Oct run and cramp: skip the squat and deadlift, do core and bands only.':'',arm?'Left arm not pain-free yet: skip the crossed-out moves.':'','No overhead pressing, ever.'+(which==='sun'?' Calf raises only on Sunday.':'')].filter(Boolean)};
 }
 function weekDays(w){
   const mon=add(START,7*(w-1));
@@ -389,6 +396,7 @@ function weekDays(w){
     else if(i===2)o.swim=easy(w,d);
     else if(i===3)o.swim=fast(w,d);
     else if(i===5)o.swim=long(w,d);
+    else if(i===6&&w===4)o.rest='Plan changed: the 1,000 m test moved to Tue 27 Oct, 07:45. Gym stays on Tue 12:00.';
     else if(i===6)o.gym=gym(w,d,'sun');
     else o.rest=i===0?'Walk 30 minutes. Stretch lats, triceps and calves.':'No swim, no gym. Fresh arms for Saturday.';
     return o});
@@ -455,7 +463,7 @@ function render(){
   if(o.swim){html=swimCard(o,o.swim);if(o.gym)html+=gymBlock(o,o.gym,false)}
   else if(o.i===1){html=`<div class="chead"><div class="eyebrow">${dlong(o.date)}</div><h2>Before the plan</h2></div>${DONE[ymd(o.date)]?`<div class="donebox"><b>Done ✓</b> ${DONE[ymd(o.date)].t}</div>`:''}<p class="rest">The plan started on 30 Sep.</p>`+gymBlock(o,o.gym,false)}
   else if(o.gym)html=gymBlock(o,o.gym,true);
-  else html=`<div class="chead"><div class="eyebrow">${dlong(o.date)}${rel(o.date)?' · '+rel(o.date):''}</div><h2>Rest</h2></div><p class="rest">${o.rest}</p><div class="cue"><b>Every day:</b> catch routine, 12 min (below).</div>`;
+  else html=`<div class="chead"><div class="eyebrow">${dlong(o.date)}${rel(o.date)?' · '+rel(o.date):''}</div><h2>Rest</h2></div>${DONE[ymd(o.date)]?`<div class="donebox"><b>Done ✓</b> ${DONE[ymd(o.date)].t}${DONE[ymd(o.date)].n?`<div class="dn2">${DONE[ymd(o.date)].n}</div>`:''}</div>`:''}<p class="rest">${o.rest}</p><div class="cue"><b>Every day:</b> catch routine, 12 min (below).</div>`;
   $('card').innerHTML=html;
   const fl=flagOn(o.date)&&o.date>=add(TODAY,-1);$('flag').hidden=!fl;if(fl)$('flag').innerHTML=FLAG.text;
 }
