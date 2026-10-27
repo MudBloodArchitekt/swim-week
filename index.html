@@ -246,7 +246,7 @@ const WK={
  2:{tue:34,thu:S8,sat:{m:2250,p:35}},
  3:{tue:34,thu:S8,sat:{m:3000,p:35}},
  4:{light:true,cue:'The catch: hand drops first, elbow stays high.',thu:S100('2:08','32 s','2:40'),sat:{timed:1330,stk:true}},
- 5:{tue:34,tueTest:1330,thu:S150,sat:{m:3000,p:34.5}},
+ 5:{tue:34,thu:S150,sat:{m:3000,p:34.5}},
  6:{tue:33.5,thu:S150,sat:{m:3000,p:34.5}},
  7:{tue:33.5,thu:S150,sat:{m:3000,p:34.5,check:true}},
  8:{light:true,thu:S100('2:07','32 s','2:40'),sat:{timed:1310}},
@@ -278,7 +278,8 @@ const DONE={
  '2026-10-20':{t:"1,900 m · 2'24\" · HR 144",n:'9 stops, 3:11 · best 100 m: 1:58'},
  '2026-10-21':{t:"2,000 m with pull buoy · 2'54\" · HR 136",n:'19 lengths of 40 s or more, about 4 min at the wall (9 in the last 500 m)'},
  '2026-10-22':{t:'8 × 100: average 2:09.6, 2 of 8 at 2:08 · HR 150',n:'Every rest on time (29–30 s) · plan was 4 × 100'},
- '2026-10-25':{t:"725 m easy swim · 2'37\" · HR 150 (cap was 138)",n:'Right quadriceps (front thigh) cramp at about 715 m · after a 10 km run (HR 155) · not a test'}
+ '2026-10-25':{t:"725 m easy swim · 2'37\" · HR 150 (cap was 138)",n:'Right quadriceps (front thigh) cramp at about 715 m · after a 10 km run (HR 155) · not a test'},
+ '2026-10-27':{t:"1,200 m wake-up swim · 2'33\" incl. stops · HR 134",n:'42.1 strokes per 100 m · swimming only 2:09 per 100 m · 7:02 stopped (crowded lane) · last 100 m 1:57 · not a test'}
 };
 const FLAG={from:'2026-10-17',text:'<i>Left arm 2/10</i><span>Bands before every swim, no exceptions. Gym: legs, core and light bands only.</span>'};
 const flagOn=d=>ymd(d)>=FLAG.from;
@@ -396,7 +397,7 @@ function weekDays(w){
     else if(i===2)o.swim=easy(w,d);
     else if(i===3)o.swim=fast(w,d);
     else if(i===5)o.swim=long(w,d);
-    else if(i===6&&w===4)o.rest='Plan changed: the 1,000 m test moved to Tue 27 Oct, 07:45. Gym stays on Tue 12:00.';
+    else if(i===6&&w===4)o.rest='No swim, no gym. Fresh arms for Saturday.';
     else if(i===6)o.gym=gym(w,d,'sun');
     else o.rest=i===0?'Walk 30 minutes. Stretch lats, triceps and calves.':'No swim, no gym. Fresh arms for Saturday.';
     return o});
